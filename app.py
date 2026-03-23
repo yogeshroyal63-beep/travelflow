@@ -1104,7 +1104,8 @@ if st.session_state.results:
         <div class="footer-note">Data: OpenWeatherMap · Overpass API (OSM) · Nominatim · Groq LLaMA 3.3 &nbsp;·&nbsp; {datetime.now().strftime("%B %Y")}</div>
     </div>""", unsafe_allow_html=True)
 
-elif not search_clic
+elif not search_clicked:
+    st.markdown("""
     <div style="text-align:center;padding:20px 40px 80px;opacity:0.4">
         <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#C9A84C;text-transform:uppercase">
             ✦ &nbsp; Enter a destination above to begin &nbsp; ✦
