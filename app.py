@@ -1,9 +1,7 @@
-import ssl
 import certifi
 import os
 os.environ["SSL_CERT_FILE"] = certifi.where()
 os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
-ssl._create_default_https_context = ssl._create_unverified_context
 
 import streamlit as st
 import requests
@@ -637,6 +635,11 @@ div[data-testid="column"] { padding: 4px !important; }
 
 # ── API KEYS ──────────────────────────────────────────────────────────────────
 OWM_KEY = st.secrets.get("OPENWEATHER_KEY", "demo")
+GROQ_KEY = st.secrets.get("GROQ_API_KEY", "")
+
+if not GROQ_KEY:
+    st.error("⚠️ **GROQ_API_KEY** is not set. Add it to `.streamlit/secrets.toml` to enable AI insights.")
+    st.stop()
 
 # ── HELPER FUNCTIONS ──────────────────────────────────────────────────────────
 
@@ -809,7 +812,7 @@ def get_hotels(city: str, lat: float, lon: float):
 
 
 def get_ai_insights(destination, weather, attractions, hotels, trip_type, duration, budget):
-    client = Groq(api_key=st.secrets.get("GROQ_API_KEY", ""))
+    client = Groq(api_key=GROQ_KEY)
     attraction_list = "\n".join([f"- {a['name']} ({a['kind']})" for a in attractions[:8]])
     hotel_list = "\n".join([f"- {h['name']} ({h['tier']}, ${h['price']}/night)" for h in hotels[:4]])
     prompt = f"""You are TRAVELFLOW, an elite AI travel intelligence system used by luxury travel agencies.
