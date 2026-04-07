@@ -644,12 +644,29 @@ if not GROQ_KEY:
 # ── HELPER FUNCTIONS ──────────────────────────────────────────────────────────
 
 def get_coords(city: str):
+    headers = {
+        "User-Agent": "TravelFlowAI/1.0 (https://travelflow.streamlit.app)",
+        "Accept-Language": "en",
+        "Accept": "application/json",
+    }
+    # Try Nominatim first
     try:
-        url = f"https://nominatim.openstreetmap.org/search?q={requests.utils.quote(city)}&format=json&limit=1"
-        r = requests.get(url, headers={"User-Agent": "TRAVELFLOWAI/1.0"}, timeout=8)
+        url = f"https://nominatim.openstreetmap.org/search?q={requests.utils.quote(city)}&format=json&limit=1&addressdetails=1"
+        r = requests.get(url, headers=headers, timeout=10)
         data = r.json()
         if data:
             return float(data[0]["lat"]), float(data[0]["lon"]), data[0].get("display_name", city)
+    except:
+        pass
+    # Fallback: Photon geocoder
+    try:
+        url = f"https://photon.komoot.io/api/?q={requests.utils.quote(city)}&limit=1"
+        r = requests.get(url, headers=headers, timeout=10)
+        features = r.json().get("features", [])
+        if features:
+            coords = features[0]["geometry"]["coordinates"]
+            name = features[0]["properties"].get("name", city)
+            return float(coords[1]), float(coords[0]), name
     except:
         pass
     return None, None, None
